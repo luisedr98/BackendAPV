@@ -95,8 +95,37 @@ const olvidePassword = async(req, res) => {
         console.log(err);
     }
 }
-const comprobarToken = (req, res) => {}
-const nuevoPassword = (req, res) => {}
+const comprobarToken = async(req, res) => {
+    const {token} = req.params;
+    const usuarioTokenValido = await Veterinario.findOne({token});
+    
+    if(usuarioTokenValido){
+        return res.status(200).json({message : 'token válido'})
+    }else{
+        const error = Error('token no inválido');
+        return res.status(404).json({message : error.message});
+    }
+}
+const nuevoPassword = async(req, res) => {
+    const {password} = req.body;
+    const {token} = req.params;
+
+    const veterinario = await Veterinario.findOne({token});
+    console.log(veterinario);
+    if(!veterinario){
+        const error = Error('Hubo un error');
+        return res.status(404).json({message : error.message});
+    }
+
+    try{
+        veterinario.token = null;
+        veterinario.password = password;
+        await veterinario.save();
+        return res.status(200).json({message: 'Contraseña cambiada correctamente'})
+    }catch(err){
+        console.log(err);
+    }
+}
 
 export {
     perfil,

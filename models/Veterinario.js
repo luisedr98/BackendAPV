@@ -39,7 +39,7 @@ const VeterinarioSchema = mongoose.Schema({
 
 
 VeterinarioSchema.pre("save", async function(next){
-    if(this.isModified("password")){
+    if(!this.isModified("password")){
         next();
     } 
     const salt = await bcrypt.genSalt(10);
