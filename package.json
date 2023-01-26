@@ -1,0 +1,23 @@
+{
+  "name": "backend-apv",
+  "version": "1.0.0",
+  "description": "BackEnd APV",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "author": "Luis Dominguez",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^6.8.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
