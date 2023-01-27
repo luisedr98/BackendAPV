@@ -2,11 +2,10 @@ import  express  from "express";
 import dotenv from "dotenv";
 import conectarDB from "./config/db.js";
 import veterinarioRoutes from "./routes/veterinarioRoutes.js";
+import pacienteRoutes from "./routes/pacienteRoutes.js";
 
 const app = express();
 
-//* habilitando la lectura del body de tipo json
-app.use(express.json());
 
 //* habilitando el uso de las variables de entorno
 dotenv.config();
@@ -19,5 +18,9 @@ app.listen(process.env.PORT , ()=>{
 //* conectando a la base de datos
 conectarDB();
 
-//* usando las rutas del api de veterinarios 
+//* habilitando la lectura del body de tipo json
+app.use(express.json());
+
+//* usando las rutas del api de veterinarios y pacientes
 app.use('/api/v1/veterinarios', veterinarioRoutes);
+app.use('/api/v1/pacientes', pacienteRoutes);
