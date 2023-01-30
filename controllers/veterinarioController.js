@@ -1,9 +1,11 @@
 import Veterinario from "../models/Veterinario.js";
 import generarJWT from "../helpers/generarJWT.js";
 import generarID from "../helpers/generarID.js";
+import registroCorreo from "../helpers/registroCorreo.js";
+import olvidePasswordCorreo from "../helpers/olvidePasswordCorreo.js";
 
 const registrar = async (req, res) =>{
-    const {email} = req.body;
+    const {email ,nombre} = req.body;
     const emailDuplicado = await Veterinario.findOne({email});
     
     if (emailDuplicado){
@@ -14,7 +16,12 @@ const registrar = async (req, res) =>{
     try{
         const veterinario = new Veterinario(req.body);
         const veterinarioGuardado = await veterinario.save();
-        res.json(veterinarioGuardado);
+        registroCorreo({
+            email,
+            nombre,
+            token: veterinarioGuardado.token,
+        })
+        res.status(201).json(veterinarioGuardado);
     }catch(err){
         console.log(err);
     }
@@ -83,14 +90,22 @@ const olvidePassword = async(req, res) => {
     const veterinario = await Veterinario.findOne({email});
     
     if(!veterinario){
-        const error = Error('El correo es inválido');
+        const error = Error('El correo no existe');
         return res.status(404).json({message : error.message});
     }
 
     try{
         veterinario.token = generarID();
         await veterinario.save();
-        return res.status(200).json({message : 'Token generado de forma correcta'});
+
+        //* enviando el correo de reestableceer contraseña
+        olvidePasswordCorreo({
+            email,
+            nombre: veterinario.nombre,
+            token: veterinario.token
+        });
+
+        return res.status(200).json({message : 'Instrucciones enviadas al correo'});
     }catch(err){
         console.log(err);
     }
