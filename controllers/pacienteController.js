@@ -6,7 +6,7 @@ const agregarPaciente = async (req, res) => {
         nuevoPaciente.veterinario = req.veterinario._id;
         console.log(nuevoPaciente);
         const pacienteAlmacenado = await nuevoPaciente.save();
-        res.status(201).json({ pacienteAlmacenado });
+        res.status(201).json(pacienteAlmacenado);
     } catch (err) {
         console.log(err);
     }
@@ -16,7 +16,7 @@ const mostrarPacientes = async (req, res) => {
     const pacientes = await Paciente.find()
         .where("veterinario")
         .equals(req.veterinario);
-    res.status(200).json({ pacientes });
+    res.status(200).json( pacientes );
 };
 
 
@@ -75,7 +75,7 @@ const eliminarPaciente = async (req, res) => {
 
     try {
         await paciente.deleteOne();
-        return res.status(200).json({message : 'registro eliminado'});
+        return res.status(200).json({message : 'Paciente eliminado'});
     } catch (error) {
         console.log(error)
     }

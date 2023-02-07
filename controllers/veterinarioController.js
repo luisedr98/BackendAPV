@@ -29,9 +29,7 @@ const registrar = async (req, res) =>{
 
 const perfil = (req, res) =>{
     const {veterinario} = req;
-    res.json({
-        perfil : veterinario,
-    });
+    res.status(200).json(veterinario);
 }
 
 
@@ -64,17 +62,23 @@ const autenticar = async(req, res) => {
         //* comprobando si el usuario existe
         if (!veterinarioExistente){
             const error = Error('El usuario no existe');
-            return res.status(403).json({message: error.message});
+            return res.status(404).json({message: error.message});
         }
 
         // * verificando que este confirmado
         if(!veterinarioExistente.email_confirmado){
-            const error = Error('El usuario no está autenticado');
+            const error = Error('Tu cuenta no ha sido confirmado');
             return res.status(403).json({message: error.message});
         }
 
         if(await veterinarioExistente.compararPassword(password)){
-           res.json({token: generarJWT(veterinarioExistente.id)});
+
+           return res.status(200).json({
+            _id : veterinarioExistente._id,
+            nombre : veterinarioExistente.nombre,
+            email : veterinarioExistente.email,
+            token : generarJWT(veterinarioExistente.id)
+           });
 
         } else {
             const error = Error('La contraseña es incorrecta');

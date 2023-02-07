@@ -13,7 +13,7 @@ dotenv.config();
 
 //* hanilitando el puerto
 app.listen(process.env.PORT , ()=>{
-    console.log('conectado en el puerto 4000')
+    console.log('conectado en el puerto %s', process.env.PORT)
 });
 
 //* conectando a la base de datos
