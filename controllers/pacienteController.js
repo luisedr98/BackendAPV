@@ -4,31 +4,43 @@ const agregarPaciente = async (req, res) => {
     try {
         const nuevoPaciente = new Paciente(req.body);
         nuevoPaciente.veterinario = req.veterinario._id;
-        console.log(nuevoPaciente);
         const pacienteAlmacenado = await nuevoPaciente.save();
-        res.status(201).json(pacienteAlmacenado);
+        return res.status(201).json(pacienteAlmacenado);
     } catch (err) {
         console.log(err);
+        const error = Error('No se pudo agregar al paciente');
+        return res.status(500).json({message : error.message});
     }
 };
 
 const mostrarPacientes = async (req, res) => {
+    try {
     const pacientes = await Paciente.find()
         .where("veterinario")
         .equals(req.veterinario);
-    res.status(200).json( pacientes );
+    return res.status(200).json( pacientes );
+    } catch (e) {
+        console.log(e);
+        const error = Error('Error en el servidor');
+        return res.status(500).json({message : error.message});
+    }
 };
 
 
 const mostrarPaciente = async (req, res) => {
     const { id } = req.params;
     const paciente = await Paciente.findById(id);
-    if (!paciente) return res.status(404).json({ message: "No existe el paciente" });
+
+    if (!paciente) {
+        const error = Error('El paciente no existe');
+        return res.status(404).json({ message: error.message })
+    };
 
     if (paciente.veterinario._id.toString() !== req.veterinario._id.toString()) {
+        const error = Error('No está autorizado para acceder a estos datos');
         return res
             .status(403)
-            .json({ message: "No está autorizado para acceder a estos datos" });
+            .json({ message: error.message });
     } else
         return res.status(200).json(paciente);
 
@@ -38,12 +50,17 @@ const actualizarPaciente = async (req, res) => {
     const { id } = req.params;
     const paciente = await Paciente.findById(id);
 
-    if (!paciente) return res.status(404).json({ message: "No existe el paciente" });
+    if (!paciente) {
+        const error = Error("No existe el paciente");
+        return res.status(404).json({ message: error.message });
+    }
 
     if (paciente.veterinario._id.toString() !== req.veterinario._id.toString()) {
+        const error = Error("No está autorizado para acceder a estos datos");
+
         return res
             .status(403)
-            .json({ message: "No está autorizado para acceder a estos datos" });
+            .json({ message:  error.message});
     }
 
     paciente.nombre = req.body.nombre || paciente.nombre;
@@ -55,8 +72,10 @@ const actualizarPaciente = async (req, res) => {
     try {
         const pacienteActualizado = await paciente.save();
         return res.status(200).json(pacienteActualizado);
-    } catch (error) {
-        console.log(error);
+    } catch (e) {
+        console.log(e);
+        const error = Error('Error en el servidor');
+        return res.status(500).json({message : error.message});
     }
 };
 
@@ -65,19 +84,25 @@ const eliminarPaciente = async (req, res) => {
     const { id } = req.params;
     const paciente = await Paciente.findById(id);
 
-    if (!paciente) return res.status(404).json({ message: "No existe el paciente" });
+    if (!paciente){
+        const error = Error("No existe el paciente")
+        return res.status(404).json({ message:  error.message});
+    } 
 
     if (paciente.veterinario._id.toString() !== req.veterinario._id.toString()) {
+        const error = Error("No está autorizado para acceder a estos datos");
         return res
             .status(403)
-            .json({ message: "No está autorizado para acceder a estos datos" });
+            .json({ message: error.message });
     }
 
     try {
         await paciente.deleteOne();
         return res.status(200).json({message : 'Paciente eliminado'});
-    } catch (error) {
-        console.log(error)
+    } catch (e) {
+        console.log(e);
+        const error = Error('Error en el servidor');
+        return res.status(500).json({message : error.message});
     }
 };
 

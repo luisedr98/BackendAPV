@@ -77,6 +77,8 @@ const autenticar = async(req, res) => {
             _id : veterinarioExistente._id,
             nombre : veterinarioExistente.nombre,
             email : veterinarioExistente.email,
+            telefono: veterinarioExistente.telefono,
+            web : veterinarioExistente.web,
             token : generarJWT(veterinarioExistente.id)
            });
 
@@ -146,12 +148,63 @@ const nuevoPassword = async(req, res) => {
     }
 }
 
-export {
+const editarPerfil = async(req, res) => {
+    
+    const veterinario = await Veterinario.findById(req.params.id);
+    if(!veterinario){
+        const error = Error('Hubo un error');
+        return res.status(404).json({message: error.message})
+    }
+
+    if(veterinario.email != req.body.email){
+        const emailRepetido = await Veterinario.findOne({email: req.body.email});
+        if(emailRepetido){
+            const error = Error('Ese correo ya esta registrado');
+            return res.status(403).json({message: error.message})
+        }
+    }
+
+    try {
+        veterinario.nombre = req.body.nombre || veterinario.nombre;
+        veterinario.email = req.body.email || veterinario.email;
+        veterinario.web = req.body.web || veterinario.web;
+        veterinario.telefono = req.body.telefono || veterinario.telefono;
+        const {_id, email, web, nombre, __v, telefono } = await veterinario.save();
+        return res.status(200).json({_id, email, web, nombre, telefono, __v});
+    } catch (error) {
+        console.log(error);
+    }
+} 
+
+const cambiarPassword = async(req, res) =>{
+    const {id} = req.veterinario;
+    const {pass_nuevo, pass_actual} = req.body;
+
+    const veterinario = await Veterinario.findById(id);
+    if(!veterinario){
+        const error = Error('No es posible realizar la acción');
+        return res.status(404).json({message: error.message})
+    }
+
+    if(await veterinario.compararPassword(pass_actual)) {
+        veterinario.password = pass_nuevo;
+        await veterinario.save()
+        return res.status(200).json({message: "Contraseña cambiada"})
+    }
+    else{
+        const error = Error('La contraseña actual es incorrecta');
+        return res.status(403).json({message: error.message})
+    }
+}
+
+export { 
     perfil,
     confirmar,
     registrar,
     autenticar,
     olvidePassword,
     comprobarToken,
-    nuevoPassword
+    nuevoPassword, 
+    editarPerfil,
+    cambiarPassword
 }
