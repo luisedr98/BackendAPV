@@ -13,7 +13,7 @@ const registroCorreo = async (datos) => {
   const {nombre, email, token} = datos;
 
   const info = await transporter.sendMail({
-    from: 'Administrador de Pacientes de Veterinaria - APV',
+    from:  '"APV - Administrador Pacientes Veterinaria" <apv@correo.com>',
     to: `${email}`,
     subject: "Confirma tu cuenta APV", 
     text: "Confirma tu cuenta", 
